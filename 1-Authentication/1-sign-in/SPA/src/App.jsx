@@ -7,8 +7,13 @@ import { MsalProvider, AuthenticatedTemplate, useMsal, UnauthenticatedTemplate }
 import { Container } from 'react-bootstrap';
 import { PageLayout } from './components/PageLayout';
 import { IdTokenData } from './components/DataDisplay';
-
+import { AppInsightsCore } from '@microsoft/1ds-core-js';
+import { AuthPlugin, AuthType } from '@microsoft/1ds-auth-js';
+import { LocalStorageChannel } from '@microsoft/1ds-localstorage-js';
+import { ApplicationInsights } from '@microsoft/1ds-wa-js';
 import './styles/App.css';
+import { PostChannel } from '@microsoft/1ds-post-js';
+
 
 const MainContent = () => {
     /**
@@ -39,6 +44,48 @@ const MainContent = () => {
         </div>
     );
 };
+// Initialize AppInsights
+const appInsightsCore = new AppInsightsCore();
+const webAnalyticsPlugin = new ApplicationInsights();
+const collectorChannelPlugin = new PostChannel();
+const authPlugin = new AuthPlugin();
+const localStorageChannel = new LocalStorageChannel();
+const authConfig = {
+    authType: AuthType.MSA,
+    loggedInStatusCallback: () => {console.log("logged in"); return true;}};
+const TENANT_KEY = "TENANT_KEY";
+// var endpoint = 'https://dc.services.visualstudio.com/v2/track' ;
+
+const config = {
+    instrumentationKey: TENANT_KEY,
+    // endpointUrl: endpoint,
+    extensions: [webAnalyticsPlugin, authPlugin, collectorChannelPlugin,],
+    channels: [[
+        localStorageChannel,
+      ]],
+    extensionConfig: {
+        [webAnalyticsPlugin.identifier]: {
+            autoCapture: {
+                pageView: true,
+                click: true,
+                scroll: true,
+                onUnload: true,
+            },
+        },
+        [authPlugin.identifier]: authConfig,
+    },
+};
+appInsightsCore.initialize(config, []);
+
+console.log("appInCore", appInsightsCore.isInitialized());
+
+// Send telemetry
+appInsightsCore.track({ name: "ReactTelemetryEvent", baseData: {}, baseType: "TestBaseType" });
+appInsightsCore.track({ name: "ReactTelemetryEvent", baseData: {}, baseType: "TestBaseType" });
+appInsightsCore.track({ name: "ReactTelemetryEvent", baseData: {}, baseType: "TestBaseType" });
+appInsightsCore.track({ name: "ReactTelemetryEvent", baseData: {}, baseType: "TestBaseType" });
+appInsightsCore.track({ name: "ReactTelemetryEvent", baseData: {}, baseType: "TestBaseType" });
+appInsightsCore.flush();
 
 /**
  * msal-react is built on the React context API and all parts of your app that require authentication must be
