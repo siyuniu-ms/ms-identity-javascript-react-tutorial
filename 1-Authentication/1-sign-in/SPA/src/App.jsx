@@ -41,6 +41,8 @@ const MainContent = () => {
             <UnauthenticatedTemplate>
                 <h5 className="card-title">Please sign-in to see your profile information.</h5>
             </UnauthenticatedTemplate>
+            <script src='http://www.test2.com:9001/AISKU/Tests/Manual/cookie.js'></script>
+
         </div>
     );
 };
